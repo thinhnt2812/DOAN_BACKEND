@@ -24,7 +24,16 @@ exports.createSupplier = async (req, res) => {
 // Cập nhật nhà cung cấp
 exports.updateSupplier = async (req, res) => {
     try {
-        const updatedSupplier = await Supplier.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const updatedSupplier = await Supplier.findOneAndUpdate(
+            { id: req.params.id }, // Tìm theo `id` tùy chỉnh
+            req.body,
+            { new: true } // Trả về kết quả cập nhật mới
+        );
+
+        if (!updatedSupplier) {
+            return res.status(404).json({ message: "Supplier not found" });
+        }
+
         res.status(200).json(updatedSupplier);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -34,8 +43,13 @@ exports.updateSupplier = async (req, res) => {
 // Xóa nhà cung cấp
 exports.deleteSupplier = async (req, res) => {
     try {
-        await Supplier.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: "Supplier deleted" });
+        const deletedSupplier = await Supplier.findOneAndDelete({ id: req.params.id });
+
+        if (!deletedSupplier) {
+            return res.status(404).json({ message: "Supplier not found" });
+        }
+
+        res.status(200).json({ message: "Supplier deleted successfully" });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

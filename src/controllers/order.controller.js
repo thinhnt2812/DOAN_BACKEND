@@ -24,7 +24,16 @@ exports.createOrder = async (req, res) => {
 // Cập nhật đơn hàng
 exports.updateOrder = async (req, res) => {
     try {
-        const updatedOrder = await Order.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const updatedOrder = await Order.findOneAndUpdate(
+            { id: req.params.id }, // Tìm theo `id` tùy chỉnh
+            req.body,
+            { new: true } // Trả về kết quả cập nhật mới
+        );
+
+        if (!updatedOrder) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+
         res.status(200).json(updatedOrder);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -34,8 +43,13 @@ exports.updateOrder = async (req, res) => {
 // Xóa đơn hàng
 exports.deleteOrder = async (req, res) => {
     try {
-        await Order.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: "Order deleted" });
+        const deletedOrder = await Order.findOneAndDelete({ id: req.params.id });
+
+        if (!deletedOrder) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        res.status(200).json({ message: "Order deleted successfully" });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

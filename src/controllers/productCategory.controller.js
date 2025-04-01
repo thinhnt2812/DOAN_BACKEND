@@ -24,7 +24,16 @@ exports.createProductCategory = async (req, res) => {
 // Cập nhật danh mục sản phẩm
 exports.updateProductCategory = async (req, res) => {
     try {
-        const updatedCategory = await ProductCategory.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const updatedCategory = await ProductCategory.findOneAndUpdate(
+            { id: req.params.id }, // Tìm theo `id` tùy chỉnh
+            req.body,
+            { new: true } // Trả về kết quả cập nhật mới
+        );
+
+        if (!updatedCategory) {
+            return res.status(404).json({ message: "Product category not found" });
+        }
+
         res.status(200).json(updatedCategory);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -34,8 +43,13 @@ exports.updateProductCategory = async (req, res) => {
 // Xóa danh mục sản phẩm
 exports.deleteProductCategory = async (req, res) => {
     try {
-        await ProductCategory.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: "Product category deleted" });
+        const deletedCategory = await ProductCategory.findOneAndDelete({ id: req.params.id });
+
+        if (!deletedCategory) {
+            return res.status(404).json({ message: "Product category not found" });
+        }
+
+        res.status(200).json({ message: "Product category deleted successfully" });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

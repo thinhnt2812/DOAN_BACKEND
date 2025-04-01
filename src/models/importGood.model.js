@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const importGoodSchema = new mongoose.Schema({
-    id: { type: String },
+    id: { type: String, required: true, unique: true },
     nameproduct: { type: String },
     type: { type: String },
     supplier: { type: String },
